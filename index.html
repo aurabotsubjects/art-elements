@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Art Explorer — Elements of Art &amp; Principles of Design</title>
+  <meta name="description" content="An interactive Year 5-6 art curriculum: Elements of Art & Principles of Design, term map and weekly lessons." />
+  <style>
+    html, body { margin: 0; padding: 0; background: #fdf8ef; }
+    #root { min-height: 100vh; }
+    #loading-fallback {
+      font-family: -apple-system, sans-serif; text-align: center; padding: 80px 20px; color: #6c6390;
+    }
+  </style>
+
+  <!-- React (production UMD builds — no build step required) -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+
+  <!-- Babel Standalone: lets the browser compile the JSX component files directly.
+       (For a faster production load later, these files can be precompiled with a
+       real bundler — see README.md — but none is required to run this as-is.) -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js" crossorigin></script>
+</head>
+<body>
+  <div id="root">
+    <div id="loading-fallback">Loading Art Explorer…</div>
+  </div>
+
+  <!-- Plain JS helpers (no JSX, load before the components) -->
+  <script src="components/storage-shim.js"></script>
+  <script type="text/babel" data-presets="react" src="components/icons.js"></script>
+
+  <!-- App components -->
+  <script type="text/babel" data-presets="react" src="components/term-map.js"></script>
+  <script type="text/babel" data-presets="react" src="components/week1-line.js"></script>
+  <script type="text/babel" data-presets="react" src="components/week2-shape-form.js"></script>
+  <script type="text/babel" data-presets="react" src="components/week3-colour.js"></script>
+
+  <!-- Navigation shell + render -->
+  <script type="text/babel" data-presets="react" src="components/app.js"></script>
+</body>
+</html>
