@@ -11,6 +11,10 @@
     #loading-fallback {
       font-family: -apple-system, sans-serif; text-align: center; padding: 80px 20px; color: #6c6390;
     }
+    #boot-error {
+      font-family: -apple-system, sans-serif; white-space: pre-wrap; padding: 24px; margin: 20px;
+      background: #fff0ee; border: 1px solid #f3b8b0; border-radius: 8px; color: #7a1f12; font-size: 13px;
+    }
   </style>
 
   <!-- React (production UMD builds — no build step required) -->
@@ -18,8 +22,11 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 
   <!-- Babel Standalone: lets the browser compile the JSX component files directly.
-       (For a faster production load later, these files can be precompiled with a
-       real bundler — see README.md — but none is required to run this as-is.) -->
+       We drive it manually (see the loader script at the bottom) rather than using
+       its automatic <script type="text/babel"> scanning, so we can force the
+       "classic" JSX runtime — the newer default "automatic" runtime injects an
+       ES `import` statement into the compiled output, which breaks when the
+       script runs as a plain, non-module <script> tag. -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js" crossorigin></script>
 </head>
 <body>
@@ -27,17 +34,48 @@
     <div id="loading-fallback">Loading Art Explorer…</div>
   </div>
 
-  <!-- Plain JS helpers (no JSX, load before the components) -->
   <script src="components/storage-shim.js"></script>
-  <script type="text/babel" data-presets="react" src="components/icons.js"></script>
 
-  <!-- App components -->
-  <script type="text/babel" data-presets="react" src="components/term-map.js"></script>
-  <script type="text/babel" data-presets="react" src="components/week1-line.js"></script>
-  <script type="text/babel" data-presets="react" src="components/week2-shape-form.js"></script>
-  <script type="text/babel" data-presets="react" src="components/week3-colour.js"></script>
+  <script>
+    // Fetches a JS/JSX file, compiles it with Babel (classic JSX runtime, so
+    // compiled output calls React.createElement directly with no import
+    // needed), then runs it as a normal global script.
+    async function loadBabelScript(url) {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Failed to fetch " + url + " (" + res.status + ")");
+      const source = await res.text();
+      const { code } = Babel.transform(source, {
+        presets: [["react", { runtime: "classic" }]],
+        filename: url,
+      });
+      const script = document.createElement("script");
+      script.text = code;
+      script.setAttribute("data-source", url);
+      document.body.appendChild(script);
+    }
 
-  <!-- Navigation shell + render -->
-  <script type="text/babel" data-presets="react" src="components/app.js"></script>
+    async function boot() {
+      const files = [
+        "components/icons.js",
+        "components/term-map.js",
+        "components/week1-line.js",
+        "components/week2-shape-form.js",
+        "components/week3-colour.js",
+        "components/app.js",
+      ];
+      for (const f of files) {
+        await loadBabelScript(f);
+      }
+    }
+
+    boot().catch((err) => {
+      console.error(err);
+      const root = document.getElementById("root");
+      root.innerHTML =
+        '<div id="boot-error"><strong>Something failed to load.</strong>\n\n' +
+        (err && err.stack ? err.stack : String(err)) +
+        "\n\nOpen the browser console for more detail.</div>";
+    });
+  </script>
 </body>
 </html>
