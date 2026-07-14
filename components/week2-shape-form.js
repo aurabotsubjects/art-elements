@@ -1,3 +1,4 @@
+(function () {
 const { useState, useEffect, useRef } = React;
 const { ArrowLeft, X, ClipboardList, Check, Lock, Sparkles, Paintbrush2, Heart, BookOpen, Hand, Globe, RotateCcw, Save, Plus, Trash2, Palette } = window.ArtExplorerIcons;
 
@@ -1364,3 +1365,6 @@ function Week2ShapeForm() {
     </div>
   );
 }
+
+  window.Week2ShapeForm = Week2ShapeForm;
+})();
